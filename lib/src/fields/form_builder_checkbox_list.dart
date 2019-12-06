@@ -100,7 +100,6 @@ class _FormBuilderCheckboxListState extends State<FormBuilderCheckboxList> {
   @override
   Widget build(BuildContext context) {
     _readOnly = (_formState?.readOnly == true) ? true : widget.readOnly;
-
     return FormField(
         key: _fieldKey,
         enabled: !_readOnly,
@@ -113,51 +112,52 @@ class _FormBuilderCheckboxListState extends State<FormBuilderCheckboxList> {
           return null;
         },
         onSaved: (val) {
-          var transformed;
           if (widget.valueTransformer != null) {
-            transformed = widget.valueTransformer(val);
+            var transformed = widget.valueTransformer(val);
             _formState?.setAttributeValue(widget.attribute, transformed);
           } else
             _formState?.setAttributeValue(widget.attribute, val);
-          if (widget.onSaved != null) {
-            widget.onSaved(transformed ?? val);
-          }
         },
         builder: (FormFieldState<dynamic> field) {
           List<Widget> checkboxList = [];
           for (int i = 0; i < widget.options.length; i++) {
-            checkboxList.addAll([
-              ListTile(
-                dense: true,
-                isThreeLine: false,
-                contentPadding: EdgeInsets.all(0.0),
-                leading: _leading(field, i),
-                trailing: _trailing(field, i),
-                title: widget.options[i],
-                onTap: _readOnly
-                    ? null
-                    : () {
-                        var currentValue = field.value;
-                        if (!currentValue.contains(widget.options[i].value))
-                          currentValue.add(widget.options[i].value);
-                        else
-                          currentValue.remove(widget.options[i].value);
-                        field.didChange(currentValue);
-                        if (widget.onChanged != null)
-                          widget.onChanged(currentValue);
-                      },
-              ),
-              Divider(
-                height: 0.0,
-              ),
-            ]);
+            checkboxList.add(
+                Container(
+                    constraints: BoxConstraints(minWidth: 100, maxWidth: 188),
+                    child: Column(
+                        children: [ListTile(
+                          dense: true,
+                          isThreeLine: false,
+                          contentPadding: EdgeInsets.all(0.0),
+                          leading: _leading(field, i),
+                          trailing: _trailing(field, i),
+                          title: widget.options[i],
+                          onTap: _readOnly
+                              ? null
+                              : () {
+                            var currentValue = field.value;
+                            if (!currentValue.contains(widget.options[i].value))
+                              currentValue.add(widget.options[i].value);
+                            else
+                              currentValue.remove(widget.options[i].value);
+                            field.didChange(currentValue);
+                            if (widget.onChanged != null)
+                              widget.onChanged(currentValue);
+                          },
+                        ),
+                        ]
+                    )
+                )
+            );
           }
           return InputDecorator(
             decoration: widget.decoration.copyWith(
               enabled: !_readOnly,
               errorText: field.errorText,
             ),
-            child: Column(
+            child: Wrap(
+              runAlignment: WrapAlignment.center,
+              spacing: 4,
               children: checkboxList,
             ),
           );
